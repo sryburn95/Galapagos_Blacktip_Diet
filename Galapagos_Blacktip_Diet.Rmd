@@ -5,4 +5,207 @@ date: "2025-05-21"
 output: html_document
 ---
 
+Loading packages
+```{r}
+library(ape)
+library(phyloseq)
+library(ggplot2)
+library(tibble)
+library(dplyr)
+library(tidyverse)
+library(vegan)
+library(tidyr)
+library(car)
+library(rstatix)
+library(devtools)
+library(pairwiseAdonis)
+library(spaa)
+library(dietr)
+library(ggridges)
+library(microViz)
+library(ggraph)
+library(DT)
+library(corncob)
+library(metagMisc)
+```
 
+Load phyloseq object of just fecal swabs made in script 10
+```{r}
+Gal_Shark_Diet.ps<-readRDS(file = "/Users/savannahryburn/Desktop/Galapagos_Sharks/10_Phyloseq/Gal_Shark_Diet.ps.RDS")
+
+Gal_Shark_Diet.ps
+```
+
+Combine OTUs from the two fish species that weren't present in the Galapagos with the lowest taxonomic group
+```{r}
+# New phyloseq object so I don't mess up the old one
+Gal_Shark_Diet.ps.new1 <- Gal_Shark_Diet.ps
+
+# Extract matrix safely
+otu_mat <- as(otu_table(Gal_Shark_Diet.ps.new1), "matrix")
+
+# Double-check the OTU names (Make sure this returns exactly: "Abudefduf genus 1"  "Abudefduf taurus 1")
+grep("Abudefduf", rownames(otu_mat), value = TRUE)
+
+# save them explicitly:
+otu1 <- "Abudefduf genus 1"
+otu2 <- "Abudefduf taurus 1"
+
+# Sum the two OTUs into a new named row
+# Check if both OTUs exist
+if (all(c(otu1, otu2) %in% rownames(otu_mat))) {
+  new_otu_row <- otu_mat[otu1, ] + otu_mat[otu2, ]
+  # Add the new row
+  otu_mat <- rbind(otu_mat, "Abudefduf" = new_otu_row)
+  # Remove the original two
+  otu_mat <- otu_mat[!rownames(otu_mat) %in% c(otu1, otu2), ]
+} else {
+  stop("One or both OTU names not found!")
+}
+
+nrow(otu_mat)  # should be 32
+
+# Rebuild OTU table (make sure it has the right orientation)
+otu_tab_new <- otu_table(otu_mat, taxa_are_rows = TRUE)
+
+# Replace the OTU table in your phyloseq object
+Gal_Shark_Diet.ps.new1 <- phyloseq(
+  otu_tab_new,
+  tax_table(Gal_Shark_Diet.ps.new1),
+  sample_data(Gal_Shark_Diet.ps.new1))
+
+dim(otu_table(Gal_Shark_Diet.ps.new1))  # Should show 32 rows
+rownames(otu_table(Gal_Shark_Diet.ps.new1))  # Should include "Abudefduf"
+
+
+
+
+head(tax_table(Gal_Shark_Diet.ps.new1))
+
+# Manually create new row
+# Extract the existing tax table
+tax_mat <- as(tax_table(Gal_Shark_Diet.ps.new1), "matrix")
+
+# Create a new row (fill in with correct levels from your data structure)
+new_tax_row <- c(
+  Kingdom = "Eukaryota",
+  Phylum = "Chordata",
+  Class = "Actinopterygii",
+  Order = "Perciformes",
+  Family = "Pomacentridae",
+  Genus = "Abudefduf",
+  Species = "Abudefduf genus"  # or "Abudefduf spp." or leave NA
+)
+
+# Add the new row with the OTU name "Abudefduf"
+tax_mat <- rbind(tax_mat, "Abudefduf" = new_tax_row)
+
+# Recreate tax_table object
+new_tax_table <- tax_table(tax_mat)
+
+# Rebuild phyloseq object
+Gal_Shark_Diet.ps.new1 <- phyloseq(
+  otu_tab_new,
+  new_tax_table,
+  sample_data(Gal_Shark_Diet.ps.new1)
+)
+
+dim(otu_table(Gal_Shark_Diet.ps.new1))       # Should now be 32 x 172
+rownames(otu_table(Gal_Shark_Diet.ps.new1))  # Should include "Abudefduf"
+tax_table(Gal_Shark_Diet.ps.new1)["Abudefduf", ]  # Should show your new taxonomy
+
+View(Gal_Shark_Diet.ps.new1)
+View(Gal_Shark_Diet.ps.new1@tax_table)
+
+
+
+####### Now do this again for "Cyprinodon variegatus 1" and "Actinopteri class 1"
+
+# save them explicitly:
+otu3 <- "Cyprinodon variegatus 1"
+otu4 <- "Actinopteri class 1"
+
+# Sum the two OTUs into a new named row
+# Check if both OTUs exist
+if (all(c(otu3, otu4) %in% rownames(otu_mat))) {
+  new_otu_row <- otu_mat[otu3, ] + otu_mat[otu4, ]
+  # Add the new row
+  otu_mat <- rbind(otu_mat, "Actinopteri" = new_otu_row)
+  # Remove the original two
+  otu_mat <- otu_mat[!rownames(otu_mat) %in% c(otu3, otu4), ]
+} else {
+  stop("One or both OTU names not found!")
+}
+
+nrow(otu_mat)  # should be 31
+
+# Rebuild OTU table (make sure it has the right orientation)
+otu_tab_new <- otu_table(otu_mat, taxa_are_rows = TRUE)
+
+# Replace the OTU table in your phyloseq object
+Gal_Shark_Diet.ps.new1 <- phyloseq(
+  otu_tab_new,
+  tax_table(Gal_Shark_Diet.ps.new1),
+  sample_data(Gal_Shark_Diet.ps.new1)
+)
+
+dim(otu_table(Gal_Shark_Diet.ps.new1))  # Should show 32 rows
+rownames(otu_table(Gal_Shark_Diet.ps.new1))  # Should include "Abudefduf"
+
+
+head(tax_table(Gal_Shark_Diet.ps.new1))
+
+# Manually create new row
+# Extract the existing tax table
+tax_mat <- as(tax_table(Gal_Shark_Diet.ps.new1), "matrix")
+
+# Create a new row (fill in with correct levels from your data structure)
+new_tax_row <- c(
+  Kingdom = "Eukaryota",
+  Phylum = "Chordata",
+  Class = "Actinopteri",
+  Order = "Actinopteri class",
+  Family = "Actinopteri class",
+  Genus = "Actinopteri class",
+  Species = "Actinopteri class")
+
+# Add the new row with the OTU name "Actinopteri"
+tax_mat <- rbind(tax_mat, "Actinopteri" = new_tax_row)
+
+# Recreate tax_table object
+new_tax_table <- tax_table(tax_mat)
+
+# Rebuild phyloseq object
+Gal_Shark_Diet.ps.new1 <- phyloseq(
+  otu_tab_new,
+  new_tax_table,
+  sample_data(Gal_Shark_Diet.ps.new1)
+)
+
+dim(otu_table(Gal_Shark_Diet.ps.new1))       # Should now be 31 x 172
+rownames(otu_table(Gal_Shark_Diet.ps.new1))  # Should include "Actinopteri"
+tax_table(Gal_Shark_Diet.ps.new1)["Actinopteri", ]  # Should show your new taxonomy
+
+View(Gal_Shark_Diet.ps.new1)
+View(Gal_Shark_Diet.ps.new1@tax_table)
+View(Gal_Shark_Diet.ps.new1@otu_table)
+```
+
+Divide blacktips and scalloped hammerheads
+```{r}
+Gal_Shark_Diet_BT.ps<-subset_samples(Gal_Shark_Diet.ps.new1,Species..scientific.name.=="Carcharhinus limbatus")
+
+View(Gal_Shark_Diet_BT.ps@otu_table)
+View(Gal_Shark_Diet_BT.ps@tax_table)
+```
+
+Filter out host DNA (in this case blacktip DNA)
+```{r}
+tax_table(Gal_Shark_Diet_BT.ps)
+
+# Exclude "Carcharhinus genus"
+Gal_Shark_Diet_BT.ps <- subset_taxa(Gal_Shark_Diet_BT.ps, species != "Carcharhinus genus")
+
+View(Gal_Shark_Diet_BT.ps@otu_table)
+View(Gal_Shark_Diet_BT.ps@tax_table)
+```
