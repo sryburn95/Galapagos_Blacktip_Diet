@@ -197,6 +197,19 @@ Gal_Shark_Diet_BT.ps<-subset_samples(Gal_Shark_Diet.ps.new1,Species..scientific.
 
 View(Gal_Shark_Diet_BT.ps@otu_table)
 View(Gal_Shark_Diet_BT.ps@tax_table)
+
+#Make files to upload to FigShare for journal submission
+Gal_Shark_Diet_BT.ps.df <- as.data.frame(cbind(sample_data(Gal_Shark_Diet_BT.ps)))
+View(Gal_Shark_Diet_BT.ps.df)
+write.csv(Gal_Shark_Diet_BT.ps.df, "./Chapter3sd")
+
+Gal_Shark_Diet_BT.ps.tt <- as.data.frame(cbind(tax_table(Gal_Shark_Diet_BT.ps)))
+View(Gal_Shark_Diet_BT.ps.tt)
+write.csv(Gal_Shark_Diet_BT.ps.tt, "./Chapter3tt")
+
+Gal_Shark_Diet_BT.ps.otu <- as.data.frame(cbind(otu_table(Gal_Shark_Diet_BT.ps)))
+View(Gal_Shark_Diet_BT.ps.otu)
+write.csv(Gal_Shark_Diet_BT.ps.otu, "./Chapter3otu")
 ```
 
 Filter out host DNA (in this case blacktip DNA)
