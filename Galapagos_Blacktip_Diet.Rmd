@@ -605,7 +605,7 @@ permanova
 View(permanova)
 ```
 
-Rarefaction curve (includes genus and species, double check this)
+Rarefaction curve (includes all prey taxa) - All blacktips
 ```{r}
 Rarefaction_BT <- read.csv("Rarefaction_Gal_BT.csv")
 #View(Rarefaction_BT)
@@ -626,6 +626,98 @@ sp_BT <- specaccum(Rarefaction_BT_Reverse, object="prey taxa", permutations = 10
 
 plot(sp_BT, ylab="Number of Prey Taxa", xlab="Number of samples",col="black",ci.type="poly", ci.col="grey", ci.lty = 0,
      xlim=c(1, 110), ylim=c(1, 30)) 
+```
+
+Rarefaction curve (includes all prey taxa) - All Female blacktips
+```{r}
+Rarefaction_BT_F <- read.csv("Rarefaction_Gal_BT_Female.csv")
+View(Rarefaction_BT_F)
+
+#Switch axis
+Rarefaction_BT_F_Reverse <- data.frame(t(Rarefaction_BT_F[-1]))
+colnames(Rarefaction_BT_F_Reverse) <- Rarefaction_BT_F[, 1]
+#View(Rarefaction_BT_F_Reverse)
+
+sample_data(Rarefaction_BT_F_Reverse)
+summary(Rarefaction_BT_F_Reverse)
+attach(Rarefaction_BT_F_Reverse)
+names(Rarefaction_BT_F_Reverse)
+
+#ci=2 means that the CI is 95%
+sp_BT_F <- specaccum(Rarefaction_BT_F_Reverse, object="prey taxa", permutations = 100, ci=2)
+#View(sp_BT_F)
+
+plot(sp_BT_F, ylab="Number of Prey Taxa", xlab="Number of female samples",col="black",ci.type="poly", ci.col="grey", ci.lty = 0,
+     xlim=c(1, 60), ylim=c(1, 20)) 
+```
+
+Rarefaction curve (includes all prey taxa) - All Male blacktips
+```{r}
+Rarefaction_BT_M <- read.csv("Rarefaction_Gal_BT_Male.csv")
+#View(Rarefaction_BT_M)
+
+#Switch axis
+Rarefaction_BT_M_Reverse <- data.frame(t(Rarefaction_BT_M[-1]))
+colnames(Rarefaction_BT_M_Reverse) <- Rarefaction_BT_M[, 1]
+#View(Rarefaction_BT_M_Reverse)
+
+sample_data(Rarefaction_BT_M_Reverse)
+summary(Rarefaction_BT_M_Reverse)
+attach(Rarefaction_BT_M_Reverse)
+names(Rarefaction_BT_M_Reverse)
+
+#ci=2 means that the CI is 95%
+sp_BT_M <- specaccum(Rarefaction_BT_M_Reverse, object="prey taxa", permutations = 100, ci=2)
+#View(sp_BT_M)
+
+plot(sp_BT_M, ylab="Number of Prey Taxa", xlab="Number of male samples",col="black",ci.type="poly", ci.col="grey", ci.lty = 0,
+     xlim=c(1, 60), ylim=c(1, 25)) 
+```
+
+Rarefaction curve (includes all prey taxa) - La Nina
+```{r}
+Rarefaction_BT_LaNina <- read.csv("Rarefaction_Gal_BT_LaNina.csv")
+#View(Rarefaction_BT_LaNina)
+
+#Switch axis
+Rarefaction_BT_LaNina_Reverse <- data.frame(t(Rarefaction_BT_LaNina[-1]))
+colnames(Rarefaction_BT_LaNina_Reverse) <- Rarefaction_BT_LaNina[, 1]
+#View(Rarefaction_BT_LaNina_Reverse)
+
+sample_data(Rarefaction_BT_LaNina_Reverse)
+summary(Rarefaction_BT_LaNina_Reverse)
+attach(Rarefaction_BT_LaNina_Reverse)
+names(Rarefaction_BT_LaNina_Reverse)
+
+#ci=2 means that the CI is 95%
+sp_BT_LaNina <- specaccum(Rarefaction_BT_LaNina_Reverse, object="prey taxa", permutations = 100, ci=2)
+#View(sp_BT_LaNina)
+
+plot(sp_BT_LaNina, ylab="Number of Prey Taxa", xlab="Number of samples collected during La Niña",col="black",ci.type="poly", ci.col="grey", ci.lty = 0,
+     xlim=c(1, 9), ylim=c(1, 12)) 
+```
+
+Rarefaction curve (includes all prey taxa) - El Nino
+```{r}
+Rarefaction_BT_ElNino <- read.csv("Rarefaction_Gal_BT_ElNino.csv")
+#View(Rarefaction_BT_ElNino)
+
+#Switch axis
+Rarefaction_BT_ElNino_Reverse <- data.frame(t(Rarefaction_BT_ElNino[-1]))
+colnames(Rarefaction_BT_ElNino_Reverse) <- Rarefaction_BT_ElNino[, 1]
+#View(Rarefaction_BT_ElNino_Reverse)
+
+sample_data(Rarefaction_BT_ElNino_Reverse)
+summary(Rarefaction_BT_ElNino_Reverse)
+attach(Rarefaction_BT_ElNino_Reverse)
+names(Rarefaction_BT_ElNino_Reverse)
+
+#ci=2 means that the CI is 95%
+sp_BT_ElNino <- specaccum(Rarefaction_BT_ElNino_Reverse, object="prey taxa", permutations = 100, ci=2)
+#View(sp_BT_ElNino)
+
+plot(sp_BT_ElNino, ylab="Number of Prey Taxa", xlab="Number of samples collected during El Niño",col="black",ci.type="poly", ci.col="grey", ci.lty = 0,
+     xlim=c(1, 9), ylim=c(1, 12)) 
 ```
 
 Calculate Levin's niche width and Levin's niche overlap - Nursery Site 
